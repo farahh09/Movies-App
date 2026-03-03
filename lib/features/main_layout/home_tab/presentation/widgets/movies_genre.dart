@@ -63,6 +63,9 @@ class MoviesGenre extends StatelessWidget {
                         children: [
                           Image.network(
                             movie.mediumCoverImage ?? '',
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.broken_image);
+                            },
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 11, left: 9,),

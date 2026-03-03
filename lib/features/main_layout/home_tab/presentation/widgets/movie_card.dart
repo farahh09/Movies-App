@@ -20,47 +20,47 @@ class MovieCard extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r,),
-        child: Stack(
-          children: [
-            Image.network(
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20.r,),
+            child: Image.network(
               movie.mediumCoverImage ?? '',
               width: width,
               height: height,
               fit: BoxFit.cover,
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 11, left: 9,),
-              child: Container(
-                width: 60,
-                height: 28,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: ColorManager.darkGrey.withOpacity(0.7,),
-                ),
-                child: Row(
-                  spacing: 5,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${movie.rating}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 11, left: 9,),
+            child: Container(
+              width: 60,
+              height: 28,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.r),
+                color: ColorManager.darkGrey.withOpacity(0.7,),
+              ),
+              child: Row(
+                spacing: 5,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${movie.rating}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
                     ),
-                    Icon(
-                      Icons.star,
-                      color: ColorManager.yellow,
-                      size: 16,
-                    ),
-                  ],
-                ),
+                  ),
+                  Icon(
+                    Icons.star,
+                    color: ColorManager.yellow,
+                    size: 16,
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
