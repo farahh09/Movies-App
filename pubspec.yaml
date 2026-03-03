@@ -12,10 +12,23 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  injectable: ^2.7.1+4
+  get_it: ^9.2.1
+  dio: ^5.9.2
+  pretty_dio_logger: ^1.4.0
+  bloc: ^9.2.0
+  flutter_bloc: ^9.1.1
+  flutter_screenutil: ^5.9.3
+  carousel_slider: ^5.1.2
+  loader_overlay: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  injectable_generator: ^2.12.1
+  build_runner: ^2.11.1
 
   flutter_lints: ^6.0.0
 
