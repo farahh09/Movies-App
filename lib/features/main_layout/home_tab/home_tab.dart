@@ -2,14 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:loader_overlay/loader_overlay.dart';
 import 'package:movies/core/resources/color_manager.dart';
-import 'package:movies/di.dart';
+import 'package:movies/core/widgets/movie_card.dart';
+import 'package:movies/core/widgets/movies_genre.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_bloc.dart';
-import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_event.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_states.dart';
-import 'package:movies/features/main_layout/home_tab/presentation/widgets/movie_card.dart';
-import 'package:movies/features/main_layout/home_tab/presentation/widgets/movies_genre.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});

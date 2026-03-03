@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movies/core/resources/color_manager.dart';
+import 'package:movies/core/widgets/custom_grid_view.dart';
 import 'package:movies/di.dart';
-import 'package:movies/features/main_layout/home_tab/data/models/movie_model.dart';
-import 'package:movies/features/main_layout/home_tab/presentation/widgets/movie_card.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_bloc.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_event.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_states.dart';
@@ -63,23 +62,7 @@ class _SearchTabState extends State<SearchTab> {
                     searchController.text.isEmpty
                         ? Expanded(child: Center(child: Image.asset('assets/images/empty_result.png',),))
                         : Expanded(
-                            child: GridView.builder(
-                              itemCount: movies?.length ?? 0,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: 191 / 279,
-                              ),
-                              itemBuilder: (BuildContext context, int index) {
-                                final movie = movies?[index] ?? Movies();
-                                return MovieCard(
-                                  movie: movie,
-                                  width: 190.w,
-                                  height: 279.h,
-                                );
-                              },
-                            ),
+                            child: CustomGridView(movies: movies)
                           ),
                   ],
                 ),

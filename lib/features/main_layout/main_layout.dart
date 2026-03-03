@@ -20,7 +20,6 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int currentIndex = 0;
-  List<Widget> tabs = [HomeTab(), SearchTab(), BrowseTab(), ProfileTab()];
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +32,7 @@ class _MainLayoutState extends State<MainLayout> {
           ),
         );
       },
+
       child: BlocProvider(
         create: (context) => getIt<HomeBloc>()..add(GetMoviesEvent()),
         child: BlocConsumer<HomeBloc, HomeStates>(
@@ -44,6 +44,10 @@ class _MainLayoutState extends State<MainLayout> {
             }
           },
           builder: (context, state) {
+            final movies = state.movieResponse?.data?.movies;
+            final genres = movies?.expand((movie) => movie.genres ?? []).toSet().toList();
+            genres?.sort();
+            List<Widget> tabs = [HomeTab(), SearchTab(), BrowseTab(genres: genres,), ProfileTab()];
             return Scaffold(
               extendBody: true,
               body: tabs[currentIndex],
