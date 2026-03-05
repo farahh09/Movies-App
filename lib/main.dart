@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movies/core/routes_manager/route_manager.dart';
@@ -22,10 +23,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: child,
         onGenerateRoute: RouteGenerator.getRoute,
-        initialRoute: Routes.mainRoute,
+        initialRoute: Routes.onboardingRoute,
       ),
 
     );
   }
 }
-

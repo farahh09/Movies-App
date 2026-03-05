@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/features/main_layout/main_layout.dart';
+import 'package:movies/onboarding_screen/onboarding_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> getRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.mainRoute:
         return MaterialPageRoute(builder: (_) => const MainLayout());
+      case Routes.onboardingRoute:
+        return MaterialPageRoute(builder: (_)=> const OnBoardingScreen());
       default:
         return unDefinedRoute();
     }
