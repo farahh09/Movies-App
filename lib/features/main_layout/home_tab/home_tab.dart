@@ -110,7 +110,9 @@ class _HomeTabState extends State<HomeTab> {
                       return MoviesGenre(
                         movies: genreMovies,
                         index: index,
-                        genre: genres?[index],);
+                        genre: genres?[index],
+                        genres: genres,
+                      );
                     }
                 )
               ],

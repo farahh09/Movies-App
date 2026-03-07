@@ -48,6 +48,20 @@ import 'features/main_layout/search_tab/domain/usecases/search_movies.dart'
     as _i292;
 import 'features/main_layout/search_tab/presentation/bloc/search_bloc.dart'
     as _i504;
+import 'features/movie_details_screen/data/data_sources/movie_details_ds.dart'
+    as _i365;
+import 'features/movie_details_screen/data/data_sources/movie_details_ds_impl.dart'
+    as _i377;
+import 'features/movie_details_screen/data/repository/movie-details_repo_impl.dart'
+    as _i207;
+import 'features/movie_details_screen/domain/repository/movie_details_repo.dart'
+    as _i907;
+import 'features/movie_details_screen/domain/usecases/get_movie_details_usecase.dart'
+    as _i260;
+import 'features/movie_details_screen/domain/usecases/get_movies_suggestion_usecase.dart'
+    as _i689;
+import 'features/movie_details_screen/presentation/bloc/movie_details_bloc.dart'
+    as _i725;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -61,13 +75,25 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i984.BrowseDs>(
       () => _i689.BrowseDsImpl(gh<_i237.ApiManager>()),
     );
+    gh.factory<_i365.MovieDetailsDs>(
+      () => _i377.MovieDetailsDsImpl(gh<_i237.ApiManager>()),
+    );
     gh.factory<_i403.SearchDs>(
       () => _i906.SearchDsImpl(gh<_i237.ApiManager>()),
     );
     gh.factory<_i681.BrowseMoviesRepo>(
       () => _i782.BrowseRepoImpl(gh<_i984.BrowseDs>()),
     );
+    gh.factory<_i907.MovieDetailsRepo>(
+      () => _i207.MovieDetailsRepoImpl(gh<_i365.MovieDetailsDs>()),
+    );
     gh.factory<_i55.HomeRepo>(() => _i185.HomeRepoImpl(gh<_i816.HomeDs>()));
+    gh.factory<_i260.GetMovieDetailsUseCase>(
+      () => _i260.GetMovieDetailsUseCase(gh<_i907.MovieDetailsRepo>()),
+    );
+    gh.factory<_i689.GetMoviesSuggestionUseCase>(
+      () => _i689.GetMoviesSuggestionUseCase(gh<_i907.MovieDetailsRepo>()),
+    );
     gh.factory<_i671.BrowseMoviesUseCase>(
       () => _i671.BrowseMoviesUseCase(gh<_i681.BrowseMoviesRepo>()),
     );
@@ -82,6 +108,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i227.GetMoviesByGenreUseCase>(
       () => _i227.GetMoviesByGenreUseCase(gh<_i55.HomeRepo>()),
+    );
+    gh.factory<_i725.MovieDetailsBloc>(
+      () => _i725.MovieDetailsBloc(
+        gh<_i260.GetMovieDetailsUseCase>(),
+        gh<_i689.GetMoviesSuggestionUseCase>(),
+      ),
     );
     gh.factory<_i504.SearchBloc>(
       () => _i504.SearchBloc(gh<_i292.SearchMoviesUseCase>()),

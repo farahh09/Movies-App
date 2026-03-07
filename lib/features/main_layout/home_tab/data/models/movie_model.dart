@@ -45,6 +45,30 @@ class Meta {
     return map;
   }
 }
+class Cast {
+  String? name;
+  String? characterName;
+  String? imdbCode;
+  String? urlSmallImage;
+
+  Cast({this.name, this.characterName, this.imdbCode, this.urlSmallImage});
+
+  Cast.fromJson(dynamic json) {
+    name = json['name'];
+    characterName = json['character_name'];
+    imdbCode = json['imdb_code'];
+    urlSmallImage = json['url_small_image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['character_name'] = this.characterName;
+    data['imdb_code'] = this.imdbCode;
+    data['url_small_image'] = this.urlSmallImage;
+    return data;
+  }
+}
 
 class Data {
   Data({this.movieCount, this.limit, this.pageNumber, this.movies});
@@ -102,10 +126,17 @@ class Movies {
     this.smallCoverImage,
     this.mediumCoverImage,
     this.largeCoverImage,
+    this.mediumScreenshotImage1,
+    this.mediumScreenshotImage2,
+    this.mediumScreenshotImage3,
+    this.largeScreenshotImage1,
+    this.largeScreenshotImage2,
+    this.largeScreenshotImage3,
     this.state,
     this.torrents,
     this.dateUploaded,
     this.dateUploadedUnix,
+    this.cast
   });
 
   Movies.fromJson(dynamic json) {
@@ -119,6 +150,8 @@ class Movies {
     year = json['year'];
     rating = json['rating'];
     runtime = json['runtime'];
+    likeCount = json['like_count'];
+    descriptionIntro = json['description_intro'];
     genres = json['genres'] != null ? json['genres'].cast<String>() : [];
     summary = json['summary'];
     descriptionFull = json['description_full'];
@@ -131,7 +164,19 @@ class Movies {
     smallCoverImage = json['small_cover_image'];
     mediumCoverImage = json['medium_cover_image'];
     largeCoverImage = json['large_cover_image'];
+    mediumScreenshotImage1 = json['medium_screenshot_image1'];
+    mediumScreenshotImage2 = json['medium_screenshot_image2'];
+    mediumScreenshotImage3 = json['medium_screenshot_image3'];
+    largeScreenshotImage1 = json['large_screenshot_image1'];
+    largeScreenshotImage2 = json['large_screenshot_image2'];
+    largeScreenshotImage3 = json['large_screenshot_image3'];
     state = json['state'];
+    if (json['cast'] != null) {
+      cast = [];
+      json['cast'].forEach((v) {
+        cast?.add(Cast.fromJson(v));
+      });
+    }
     if (json['torrents'] != null) {
       torrents = [];
       json['torrents'].forEach((v) {
@@ -152,6 +197,9 @@ class Movies {
   num? year;
   num? rating;
   num? runtime;
+  num? likeCount;
+  String? descriptionIntro;
+  List<Cast>? cast;
   List<String>? genres;
   String? summary;
   String? descriptionFull;
@@ -164,6 +212,12 @@ class Movies {
   String? smallCoverImage;
   String? mediumCoverImage;
   String? largeCoverImage;
+  String? mediumScreenshotImage1;
+  String? mediumScreenshotImage2;
+  String? mediumScreenshotImage3;
+  String? largeScreenshotImage1;
+  String? largeScreenshotImage2;
+  String? largeScreenshotImage3;
   String? state;
   List<Torrents>? torrents;
   String? dateUploaded;
@@ -182,6 +236,8 @@ class Movies {
     map['rating'] = rating;
     map['runtime'] = runtime;
     map['genres'] = genres;
+    map['description_intro'] = descriptionIntro;
+    map['like_count'] = likeCount;
     map['summary'] = summary;
     map['description_full'] = descriptionFull;
     map['synopsis'] = synopsis;
@@ -193,7 +249,16 @@ class Movies {
     map['small_cover_image'] = smallCoverImage;
     map['medium_cover_image'] = mediumCoverImage;
     map['large_cover_image'] = largeCoverImage;
+    map['medium_screenshot_image1'] = this.mediumScreenshotImage1;
+    map['medium_screenshot_image2'] = this.mediumScreenshotImage2;
+    map['medium_screenshot_image3'] = this.mediumScreenshotImage3;
+    map['large_screenshot_image1'] = this.largeScreenshotImage1;
+    map['large_screenshot_image2'] = this.largeScreenshotImage2;
+    map['large_screenshot_image3'] = this.largeScreenshotImage3;
     map['state'] = state;
+    if (cast != null) {
+      map['cast'] = cast!.map((v) => v.toJson()).toList();
+    }
     if (torrents != null) {
       map['torrents'] = torrents?.map((v) => v.toJson()).toList();
     }

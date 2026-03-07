@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movies/core/routes_manager/routes.dart';
+import 'package:movies/features/main_layout/browse_tab/browse_tab.dart';
 import 'package:movies/features/main_layout/main_layout.dart';
+import 'package:movies/features/movie_details_screen/movie_details_screen.dart';
 import 'package:movies/onboarding_screen/onboarding_screen.dart';
 
 class RouteGenerator {
@@ -8,6 +10,22 @@ class RouteGenerator {
     switch (settings.name) {
       case Routes.mainRoute:
         return MaterialPageRoute(builder: (_) => const MainLayout());
+
+      case Routes.movieDetailsRoute:
+        final movieId = settings.arguments as num;
+        return MaterialPageRoute(
+          builder: (_) => MovieDetailsScreen(movieID: movieId),
+        );
+
+      case Routes.browseRoute:
+        final args = settings.arguments as Map<String, dynamic>;
+
+        final genreIndex = args["genreIndex"] as int;
+        final genres = args["genres"] as List<dynamic>?;
+
+        return MaterialPageRoute(
+          builder: (_) => BrowseTab(genreIndex: genreIndex, genres: genres,),
+        );
       case Routes.onboardingRoute:
         return MaterialPageRoute(builder: (_)=> const OnBoardingScreen());
       default:
