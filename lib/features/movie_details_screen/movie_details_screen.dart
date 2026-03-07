@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/core/widgets/custom_grid_view.dart';
 import 'package:movies/di.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_states.dart';
 import 'package:movies/features/movie_details_screen/presentation/bloc/movie_details_bloc.dart';
 import 'package:movies/features/movie_details_screen/presentation/bloc/movie_details_event.dart';
 import 'package:movies/features/movie_details_screen/presentation/bloc/movie_details_states.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
   final num movieID;
@@ -18,7 +18,7 @@ class MovieDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
-      overlayColor: ColorManager.black.withOpacity(0.7),
+      overlayColor: AppColors.blackColor.withOpacity(0.7),
       overlayWidgetBuilder: (progress) {
         return Center(
           child: CircularProgressIndicator(
@@ -42,10 +42,10 @@ class MovieDetailsScreen extends StatelessWidget {
           builder: (context, state) {
             final movie = state.movieDetailsResponse?.data?.movie;
             final suggestedMovies = state.moviesSuggestionResponse?.data?.movies;
-            if (movie == null) return Scaffold(backgroundColor: ColorManager.black, body: SizedBox());
+            if (movie == null) return Scaffold(backgroundColor: AppColors.blackColor, body: SizedBox());
 
             return Scaffold(
-              backgroundColor: ColorManager.black,
+              backgroundColor: AppColors.blackColor,
               body: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -61,8 +61,8 @@ class MovieDetailsScreen extends StatelessWidget {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  ColorManager.black.withOpacity(0.2),
-                                  ColorManager.black,
+                                  AppColors.blackColor.withOpacity(0.2),
+                                  AppColors.blackColor,
                                 ],
                               ),
                             ),
@@ -112,7 +112,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                     },
                                     icon: Icon(
                                       Icons.arrow_back_ios,
-                                      color: ColorManager.white,
+                                      color: AppColors.whiteColor,
                                       size: 29,
                                     ),
                                   ),
@@ -120,7 +120,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                     onPressed: () {},
                                     icon: Icon(
                                       Icons.bookmark_rounded,
-                                      color: ColorManager.white,
+                                      color: AppColors.whiteColor,
                                       size: 29,
                                     ),
                                   ),
@@ -138,7 +138,7 @@ class MovieDetailsScreen extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.red,
+                          backgroundColor: AppColors.redColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -148,7 +148,7 @@ class MovieDetailsScreen extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 20,
-                            color: ColorManager.white,
+                            color: AppColors.whiteColor,
                           ),
                         ),
                       ),
@@ -178,7 +178,7 @@ class MovieDetailsScreen extends StatelessWidget {
                             ],
                           ),
 
-                          Text('Screen Shots', style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Screen Shots', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
                           Column(
                             spacing: 13,
                             children: [
@@ -194,13 +194,13 @@ class MovieDetailsScreen extends StatelessWidget {
                             ],
                           ),
 
-                          Text('Similar', style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Similar', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
                           CustomGridView(movies: suggestedMovies, shrinkWrap: true, physics: NeverScrollableScrollPhysics(),),
 
-                          Text('Summary', style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w700, fontSize: 24),),
-                          Text('${movie.descriptionIntro}',style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w400, fontSize: 16),),
+                          Text('Summary', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('${movie.descriptionIntro}',style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w400, fontSize: 16),),
 
-                          Text('Cast', style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Cast', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
                           ListView.separated(
                               itemCount: movie.cast?.length ?? 0,
                               shrinkWrap: true,
@@ -210,7 +210,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                 return Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(16),
-                                        color: ColorManager.darkGrey
+                                        color: AppColors.greyColor
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(11),
@@ -235,7 +235,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.w400,
                                                       fontSize: 20,
-                                                      color: ColorManager.white,
+                                                      color: AppColors.whiteColor,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                     maxLines: 1,
@@ -245,7 +245,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.w400,
                                                       fontSize: 20,
-                                                      color: ColorManager.white,
+                                                      color: AppColors.whiteColor,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                     maxLines: 1,
@@ -261,7 +261,7 @@ class MovieDetailsScreen extends StatelessWidget {
                               }, separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8,),
                           ),
 
-                          Text('Genres', style: TextStyle(color: ColorManager.white, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Genres', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
                           GridView.builder(
                               itemCount: movie.genres?.length ?? 0,
                               shrinkWrap: true,
@@ -280,7 +280,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                     height: 36.h,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
-                                        color: ColorManager.darkGrey
+                                        color: AppColors.greyColor
                                     ),
                                     child: Center(
                                         child: Text(
@@ -288,7 +288,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
                                             fontSize: 16,
-                                            color: ColorManager.white,
+                                            color: AppColors.whiteColor,
                                           ),
                                         )
                                     )
@@ -316,7 +316,7 @@ Container movieChip(String icPath, String title) {
     height: 47.h,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(16),
-      color: ColorManager.darkGrey,
+      color: AppColors.greyColor,
     ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -328,7 +328,7 @@ Container movieChip(String icPath, String title) {
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 24,
-            color: ColorManager.white,
+            color: AppColors.whiteColor,
           ),
         ),
       ],

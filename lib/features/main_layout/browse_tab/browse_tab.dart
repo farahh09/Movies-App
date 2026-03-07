@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/core/widgets/custom_grid_view.dart';
 import 'package:movies/di.dart';
 import 'package:movies/features/main_layout/browse_tab/presentation/bloc/browse_bloc.dart';
 import 'package:movies/features/main_layout/browse_tab/presentation/bloc/browse_event.dart';
 import 'package:movies/features/main_layout/browse_tab/presentation/bloc/browse_states.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_states.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class BrowseTab extends StatefulWidget {
   final List<dynamic>? genres;
@@ -25,7 +25,7 @@ class _BrowseTabState extends State<BrowseTab> {
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
-      overlayColor: ColorManager.black.withOpacity(0.7),
+      overlayColor: AppColors.blackColor.withOpacity(0.7),
       overlayWidgetBuilder: (progress) {
         return Center(
           child: CircularProgressIndicator(
@@ -47,7 +47,7 @@ class _BrowseTabState extends State<BrowseTab> {
           builder: (context, state) {
             final movies = state.movieResponse?.data?.movies;
             return Scaffold(
-              backgroundColor: ColorManager.black,
+              backgroundColor: AppColors.blackColor,
               body: SafeArea(
                 child: Column(
                   spacing: 25,
@@ -80,10 +80,10 @@ class _BrowseTabState extends State<BrowseTab> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(16),
                                       color: selectedIndex == index
-                                          ? ColorManager.yellow
-                                          : ColorManager.black,
+                                          ? AppColors.yellowColor
+                                          : AppColors.blackColor,
                                       border: BoxBorder.all(
-                                        color: ColorManager.yellow,
+                                        color: AppColors.yellowColor,
                                         width: 2,
                                       ),
                                     ),
@@ -95,8 +95,8 @@ class _BrowseTabState extends State<BrowseTab> {
                                             fontWeight: FontWeight.w700,
                                             fontSize: 20,
                                             color: selectedIndex == index
-                                                ? ColorManager.black
-                                                : ColorManager.yellow,
+                                                ? AppColors.blackColor
+                                                : AppColors.yellowColor,
                                           ),
                                         ),
                                       ],

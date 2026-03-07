@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/core/routes_manager/routes.dart';
-import 'package:movies/features/main_layout/browse_tab/browse_tab.dart';
 import 'package:movies/features/main_layout/home_tab/data/models/movie_model.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class MoviesGenre extends StatelessWidget {
   final List<Movies>? movies;
@@ -25,7 +24,7 @@ class MoviesGenre extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12, top: 5),
-              child: Text(genre, style: TextStyle(color: ColorManager.white, fontSize: 20, fontWeight: FontWeight.w400),),
+              child: Text(genre, style: TextStyle(color: AppColors.whiteColor, fontSize: 20, fontWeight: FontWeight.w400),),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 19),
@@ -39,8 +38,8 @@ class MoviesGenre extends StatelessWidget {
                           "genres": genres,
                         },);
                       },
-                      child: Text('See More', style: TextStyle(color: ColorManager.yellow),)),
-                  Icon(Icons.arrow_forward, color: ColorManager.yellow,size: 15,),
+                      child: Text('See More', style: TextStyle(color: AppColors.yellowColor),)),
+                  Icon(Icons.arrow_forward, color: AppColors.yellowColor,size: 15,),
                 ],
               ),
             )
@@ -92,7 +91,7 @@ class MoviesGenre extends StatelessWidget {
                                 height: 28,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadiusGeometry.circular(10,),
-                                  color: ColorManager.darkGrey.withOpacity(0.7,),
+                                  color: AppColors.greyColor.withOpacity(0.7,),
                                 ),
                                 child: Row(
                                   spacing: 5,
@@ -107,7 +106,7 @@ class MoviesGenre extends StatelessWidget {
                                     ),
                                     Icon(
                                       Icons.star,
-                                      color: ColorManager.yellow,
+                                      color: AppColors.yellowColor,
                                       size: 16,
                                     ),
                                   ],
