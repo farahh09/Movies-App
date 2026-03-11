@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/di.dart';
 import 'package:movies/features/main_layout/browse_tab/browse_tab.dart';
 import 'package:movies/features/main_layout/home_tab/home_tab.dart';
@@ -10,6 +9,7 @@ import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_even
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_states.dart';
 import 'package:movies/features/main_layout/profile_tab/profile_tab.dart';
 import 'package:movies/features/main_layout/search_tab/search_tab.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -24,11 +24,11 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
-      overlayColor: ColorManager.black.withOpacity(0.7),
+      overlayColor: AppColors.blackColor.withOpacity(0.7),
       overlayWidgetBuilder: (progress) {
         return Center(
           child: CircularProgressIndicator(
-            color: Colors.white,
+            color: AppColors.whiteColor,
           ),
         );
       },
@@ -66,10 +66,10 @@ class _MainLayoutState extends State<MainLayout> {
                         height: 60,
                         child: BottomNavigationBar(
                           currentIndex: currentIndex,
-                          backgroundColor: ColorManager.darkGrey,
+                          backgroundColor: AppColors.greyColor,
                           type: BottomNavigationBarType.fixed,
-                          selectedItemColor: ColorManager.yellow,
-                          unselectedItemColor: ColorManager.white,
+                          selectedItemColor: AppColors.yellowColor,
+                          unselectedItemColor: AppColors.whiteColor,
                           showSelectedLabels: false,
                           showUnselectedLabels: false,
                           onTap: (index) {

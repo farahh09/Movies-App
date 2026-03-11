@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/features/main_layout/home_tab/data/models/movie_model.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class MovieCard extends StatelessWidget {
   final Movies movie;
@@ -38,7 +38,7 @@ class MovieCard extends StatelessWidget {
               height: 28,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.r),
-                color: ColorManager.darkGrey.withOpacity(0.7,),
+                color: AppColors.greyColor.withOpacity(0.7,),
               ),
               child: Row(
                 spacing: 5,
@@ -53,7 +53,7 @@ class MovieCard extends StatelessWidget {
                   ),
                   Icon(
                     Icons.star,
-                    color: ColorManager.yellow,
+                    color: AppColors.yellowColor,
                     size: 16,
                   ),
                 ],
