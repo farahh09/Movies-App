@@ -10,4 +10,8 @@ class AppAssets {
   static const String profileIcon = "assets/images/profile_icon.png";
   static const String searchIcon = "assets/images/search_icon.png";
   static const String browseIcon = "assets/images/browse_icon.png";
+  static const String loginImage = "assets/images/login_image.png";
+  static const String googleIcon = "assets/images/google_icon.png";
+  static const String usaIcon = "assets/images/usa_logo.png";
+  static const String egyIcon = "assets/images/egy_logo.png";
 }
