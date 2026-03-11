@@ -2,11 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/core/widgets/movie_card.dart';
 import 'package:movies/core/widgets/movies_genre.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_bloc.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_states.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -27,7 +27,7 @@ class _HomeTabState extends State<HomeTab> {
         final genres = movies?.expand((movie) => movie.genres ?? []).toSet().toList();
 
         return Scaffold(
-          backgroundColor: ColorManager.black,
+          backgroundColor: AppColors.blackColor,
           body: SingleChildScrollView(
             child: Column(
               children: [
@@ -49,9 +49,9 @@ class _HomeTabState extends State<HomeTab> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              ColorManager.black.withOpacity(0.8),
-                              ColorManager.black.withOpacity(0.6),
-                              ColorManager.black,
+                              AppColors.blackColor.withOpacity(0.8),
+                              AppColors.blackColor.withOpacity(0.6),
+                              AppColors.blackColor,
                             ],
                           ),
                         ),
@@ -110,7 +110,9 @@ class _HomeTabState extends State<HomeTab> {
                       return MoviesGenre(
                         movies: genreMovies,
                         index: index,
-                        genre: genres?[index],);
+                        genre: genres?[index],
+                        genres: genres,
+                      );
                     }
                 )
               ],

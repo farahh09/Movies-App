@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:movies/core/resources/color_manager.dart';
 import 'package:movies/core/widgets/custom_grid_view.dart';
 import 'package:movies/di.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_bloc.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_event.dart';
 import 'package:movies/features/main_layout/search_tab/presentation/bloc/search_states.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -28,33 +28,33 @@ class _SearchTabState extends State<SearchTab> {
         builder: (context, state) {
           final movies = state.movieResponse?.data?.movies;
           return Scaffold(
-            backgroundColor: ColorManager.black,
+            backgroundColor: AppColors.blackColor,
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     TextFormField(
-                      style: TextStyle(color: ColorManager.white),
+                      style: TextStyle(color: AppColors.whiteColor),
                       controller: searchController,
                       onChanged: (value) {
                         context.read<SearchBloc>().add(SearchMoviesEvent(value));
                       },
                       decoration: InputDecoration(
                         hintText: "Search",
-                        hintStyle: TextStyle(color: ColorManager.white),
+                        hintStyle: TextStyle(color: AppColors.whiteColor),
                         prefixIcon: ImageIcon(
                           AssetImage('assets/icons/search_ic.png'),
-                          color: ColorManager.white,
+                          color: AppColors.whiteColor,
                         ),
-                        fillColor: ColorManager.darkGrey,
+                        fillColor: AppColors.greyColor,
                         filled: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: ColorManager.yellow),
+                          borderSide: BorderSide(color: AppColors.yellowColor),
                         ),
                       ),
                     ),

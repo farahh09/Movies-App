@@ -12,7 +12,10 @@ class HomeDsImpl implements HomeDs {
 
   @override
   Future<MovieResponse> getMovies() async {
-    var result = await apiManager.get(Endpoints.getMovies);
+    var result = await apiManager.get(
+      Endpoints.getMovies,
+      queryParameters: {"limit": 50},
+    );
     return MovieResponse.fromJson(result.data);
   }
 
