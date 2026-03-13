@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:movies/auth/register_screen.dart';
+import 'package:movies/authentication/register/register_screen.dart';
 import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/features/main_layout/browse_tab/browse_tab.dart';
 import 'package:movies/features/main_layout/main_layout.dart';
 import 'package:movies/features/movie_details_screen/movie_details_screen.dart';
 import 'package:movies/onboarding_screen/onboarding_screen.dart';
-import 'package:movies/auth/login_screen.dart';
+import 'package:movies/authentication/login/login_screen.dart';
+import 'package:movies/profile/update_profile_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> getRoute(RouteSettings settings) {
@@ -34,6 +35,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case Routes.signUpRoute:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case Routes.updateProfileRoute:
+        return MaterialPageRoute(builder: (_) => const UpdateProfileScreen());
       default:
         return unDefinedRoute();
     }

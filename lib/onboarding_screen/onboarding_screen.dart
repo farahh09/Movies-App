@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/core/routes_manager/routes.dart';
-import '../utils/app_colors.dart';
+import 'package:movies/utils/app_colors.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -52,7 +52,9 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.of(context).pushReplacementNamed(Routes.loginRoute);
+      Navigator.of(context).pushReplacementNamed(
+        Routes.loginRoute,
+      );
     }
   }
 
@@ -87,7 +89,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   decoration: BoxDecoration(
-                    color: index == 0 ? Colors.black.withOpacity(0.4) : AppColors.blackColor,
+                    color: index == 0 ? Colors.transparent : AppColors.blackColor,
                     borderRadius: index == 0
                         ? BorderRadius.zero
                         : const BorderRadius.only(
@@ -189,13 +191,16 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: isBack ? Colors.transparent : AppColors.yellowColor,
           foregroundColor: isBack ? AppColors.yellowColor : AppColors.blackColor,
-          side: isBack ? const BorderSide(color: AppColors.yellowColor, width: 2) : BorderSide.none,
+          side: isBack
+              ? const BorderSide(color: AppColors.yellowColor, width: 2)
+              : BorderSide.none,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           padding: EdgeInsets.symmetric(vertical: size.height * 0.018),
           elevation: isBack ? 0 : 4,
         ),
         onPressed: onPressed,
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        child: Text(text,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
       ),
     );
   }
