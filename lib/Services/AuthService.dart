@@ -105,7 +105,7 @@ class AuthService {
       await _auth.currentUser?.delete();
       return "success";
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-auth') return "re-authenticate";
+      if (e.code == 'requires-recent-login') return "re-authenticate";
       return e.message;
     } catch (e) {
       return e.toString();
