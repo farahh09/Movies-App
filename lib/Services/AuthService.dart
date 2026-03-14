@@ -9,6 +9,8 @@ class AuthService {
     clientId: dotenv.env['GOOGLE_CLIENT_ID'],
   );
 
+  String? _verificationId;
+
   Future<String?> registerWithEmail({
     required String email,
     required String password,
@@ -81,6 +83,55 @@ class AuthService {
   Future<String?> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required Function(String) onCodeSent,
+    required Function(String) onVerificationFailed,
+  }) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        onVerificationFailed(e.message ?? "Verification failed");
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        _verificationId = verificationId;
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        _verificationId = verificationId;
+      },
+    );
+  }
+
+  Future<String?> updatePasswordWithOtp({
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      if (_verificationId == null) return "Invalid verification session. Try again.";
+
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: otp,
+      );
+
+      // We sign in with the phone credential first.
+      // This creates a fresh session and avoids "previously signed in user" errors.
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      
+      // Update the password for the account associated with this phone.
+      await userCredential.user?.updatePassword(newPassword);
+
       return "success";
     } on FirebaseAuthException catch (e) {
       return e.message;

@@ -13,24 +13,27 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  int selectedIndex = 8;
-  bool showAvatars = false;
+  int selectedIndex = 0;
+  bool showAvatars = true;
   bool isLoading = false;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+
   final AuthService _authService = AuthService();
 
   final List<String> avatars = [
-    "assets/images/avatar1.png",
-    "assets/images/avatar2.png",
-    "assets/images/avatar3.png",
-    "assets/images/avatar4.png",
-    "assets/images/avatar5.png",
-    "assets/images/avatar6.png",
-    "assets/images/avatar7.png",
-    "assets/images/avatar8.png",
-    "assets/images/main_avatar.png",
+    "assets/images/gamer (1) (1).png",
+    "assets/images/gamer (1) (2).png",
+    "assets/images/gamer (1) (3).png",
+    "assets/images/gamer (1) (4).png",
+    "assets/images/gamer (1) (5).png",
+    "assets/images/gamer (1) (6).png",
+    "assets/images/gamer (1) (7).png",
+    "assets/images/gamer (1) (8).png",
+    "assets/images/gamer (1) (9).png",
   ];
 
   @override
@@ -58,7 +61,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         title: const Text(
           "Update Profile",
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
             color: AppColors.yellowColor,
           ),
         ),
@@ -83,7 +87,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 SizedBox(height: height * 0.03),
                 Container(
                   padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(color: const Color(0xFF282828), borderRadius: BorderRadius.circular(25)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF212121),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -95,16 +102,24 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       return GestureDetector(
                         onTap: () => setState(() {
                           selectedIndex = index;
-                          showAvatars = false;
                         }),
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: isSelected ? AppColors.yellowColor : Colors.transparent, width: 2),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color: isSelected ? AppColors.yellowColor : Colors.transparent, 
+                                width: 2),
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(avatars[index], fit: BoxFit.cover),
+                            borderRadius: BorderRadius.circular(13),
+                            child: Image.asset(
+                              avatars[index], 
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: Colors.grey[900],
+                                child: const Icon(Icons.person, color: Colors.white24),
+                              ),
+                            ),
                           ),
                         ),
                       );
@@ -138,7 +153,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton(
-                  onPressed: _handleResetPassword,
+                  onPressed: _showPhoneResetDialog,
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
                   child: const Text(
                     "Reset Password",
@@ -149,7 +164,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: height * 0.23),
+              SizedBox(height: height * 0.05),
               CustomElevatedButton(
                 text: "Update Data",
                 style: const TextStyle(
@@ -175,6 +190,109 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ),
       ),
     );
+  }
+
+  void _showPhoneResetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF212121),
+        title: const Text("Reset Password", style: TextStyle(color: AppColors.yellowColor)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              hintText: "Phone Number (e.g., +20...)",
+              hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
+              icon: const Icon(Icons.phone, color: Colors.white),
+              color: Colors.white,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _sendOtp();
+            },
+            child: const Text("Send Code"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendOtp() async {
+    setState(() => isLoading = true);
+    await _authService.verifyPhoneNumber(
+      phoneNumber: phoneController.text.trim(),
+      onCodeSent: (id) {
+        setState(() => isLoading = false);
+        _showOtpDialog();
+      },
+      onVerificationFailed: (err) {
+        setState(() => isLoading = false);
+        _showSnack(err);
+      },
+    );
+  }
+
+  void _showOtpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF212121),
+        title: const Text("Enter Code", style: TextStyle(color: AppColors.yellowColor)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomTextField(
+              controller: otpController,
+              hintText: "6-digit Code",
+              hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
+              icon: const Icon(Icons.lock_clock, color: Colors.white),
+              color: Colors.white,
+            ),
+            const SizedBox(height: 15),
+            CustomTextField(
+              controller: newPasswordController,
+              hintText: "New Password",
+              hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
+              icon: const Icon(Icons.lock, color: Colors.white),
+              color: Colors.white,
+              obscureText: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _verifyAndReset();
+            },
+            child: const Text("Reset Password"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _verifyAndReset() async {
+    setState(() => isLoading = true);
+    final res = await _authService.updatePasswordWithOtp(
+      otp: otpController.text.trim(),
+      newPassword: newPasswordController.text.trim(),
+    );
+    setState(() => isLoading = false);
+    if (res == "success") {
+      _showSnack("Password reset successfully!");
+    } else {
+      _showSnack(res!);
+    }
   }
 
   void _handleUpdate() async {
@@ -213,14 +331,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     }
   }
 
-  void _handleResetPassword() async {
-    String? email = _authService.currentUser?.email;
-    if (email != null) {
-      await _authService.resetPassword(email);
-      _showSnack("Reset link sent to $email");
-    }
-  }
-
   void _showSnack(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -235,6 +345,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void dispose() {
     nameController.dispose();
     phoneController.dispose();
+    otpController.dispose();
+    newPasswordController.dispose();
     super.dispose();
   }
 }
