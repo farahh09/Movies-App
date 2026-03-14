@@ -98,7 +98,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.symmetric(vertical: height * 0.02),
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, Routes.forgetPasswordRoute);
+                        if (emailController.text.trim().isEmpty) {
+                          _showSnack("Please fill the email first");
+                        } else {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.forgetPasswordRoute,
+                            arguments: emailController.text.trim(),
+                          );
+                        }
                       },
                       child: const Text(
                         "Forget Password?",
