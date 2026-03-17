@@ -51,7 +51,7 @@ class MovieDetailsScreen extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: double.infinity,
-                      height: 670,
+                      height: 670.h,
                       child: Stack(
                         children: [
                           Image.network(movie.largeCoverImage ?? ''),
@@ -131,7 +131,7 @@ class MovieDetailsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     SizedBox(
                       width: 398.w,
                       height: 58.h,
@@ -140,7 +140,7 @@ class MovieDetailsScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.redColor,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15.r),
                           ),
                         ),
                         child: Text(
@@ -183,13 +183,13 @@ class MovieDetailsScreen extends StatelessWidget {
                             spacing: 13,
                             children: [
                               ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(16.h),
                                   child: Image.network(movie.largeScreenshotImage1??'')),
                               ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(16.h),
                                   child: Image.network(movie.largeScreenshotImage2??'')),
                               ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(16.h),
                                   child: Image.network(movie.largeScreenshotImage3??'')),
                             ],
                           ),
@@ -209,7 +209,7 @@ class MovieDetailsScreen extends StatelessWidget {
                               itemBuilder: (BuildContext context, int index) {
                                 return Container(
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(16.r),
                                         color: AppColors.greyColor
                                     ),
                                     child: Padding(
@@ -217,12 +217,12 @@ class MovieDetailsScreen extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10.r),
                                               child: (movie.cast?[index].urlSmallImage?.isNotEmpty == true)
                                                   ? Image.network(
                                                 movie.cast![index].urlSmallImage!,
                                               )
-                                                  : SizedBox(width: 60, height: 60, child: Icon(Icons.person, color: Colors.white,),),
+                                                  : SizedBox(width: 60.w, height: 60.h, child: Icon(Icons.person, color: Colors.white,),),
                                           ),
                                           Expanded(
                                             child: Padding(
@@ -258,7 +258,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                       ),
                                     )
                                 );
-                              }, separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8,),
+                              }, separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.h,),
                           ),
 
                           Text('Genres', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
@@ -279,7 +279,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                     width: 122.w,
                                     height: 36.h,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12.r),
                                         color: AppColors.greyColor
                                     ),
                                     child: Center(
@@ -295,7 +295,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                 );
                               }
                           ),
-                          SizedBox(height: 20,)
+                          SizedBox(height: 20.h,)
                         ],
                       ),
                     ),
@@ -315,14 +315,14 @@ Container movieChip(String icPath, String title) {
     width: 122.w,
     height: 47.h,
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       color: AppColors.greyColor,
     ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 18,
       children: [
-        Image.asset(icPath, width: 28,height: 28,),
+        Image.asset(icPath, width: 28.w,height: 28.h,),
         Text(
           title,
           style: TextStyle(
