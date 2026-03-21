@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/services/AuthService.dart';
 import 'package:movies/home/widgets/custom_elevated_button.dart';
 import 'package:movies/home/widgets/custom_text_field.dart';
 import 'package:movies/utils/app_colors.dart';
+import 'package:movies/features/main_layout/profile_tab/view_models/profile_view_model.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -39,11 +42,34 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _loadInitialData();
+  }
+
+  void _loadInitialData() async {
     nameController.text = _authService.currentUser?.displayName ?? "";
 
     String? currentPhoto = _authService.currentUser?.photoURL;
-    if (currentPhoto != null && avatars.contains(currentPhoto)) {
-      selectedIndex = avatars.indexOf(currentPhoto);
+    if (currentPhoto != null) {
+      int foundIndex = avatars.indexOf(currentPhoto);
+      if (foundIndex != -1) {
+        selectedIndex = foundIndex;
+      }
+    }
+
+    String uid = _authService.currentUser?.uid ?? "";
+    if (uid.isNotEmpty) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          setState(() {
+            phoneController.text = data['phone_number'] ?? "";
+            if (data['name'] != null) nameController.text = data['name'];
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
   }
 
@@ -55,9 +81,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.blackColor,
       appBar: AppBar(
-        backgroundColor: AppColors.blackColor,
+        backgroundColor: AppColors. blackColor,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.yellowColor),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           "Update Profile",
           style: TextStyle(
@@ -84,7 +114,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 ),
               ),
               if (showAvatars) ...[
-                SizedBox(height: height * 0.03),
+                const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -107,18 +137,14 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(
-                                color: isSelected ? AppColors.yellowColor : Colors.transparent, 
-                                width: 2),
+                                color: isSelected ? AppColors.yellowColor : Colors.transparent,
+                                width: 3),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(13),
                             child: Image.asset(
-                              avatars[index], 
+                              avatars[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                color: Colors.grey[900],
-                                child: const Icon(Icons.person, color: Colors.white24),
-                              ),
                             ),
                           ),
                         ),
@@ -131,10 +157,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               CustomTextField(
                 controller: nameController,
                 hintText: "Full Name",
-                hintStyle: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
+                hintStyle: const TextStyle(fontSize: 16, color: Colors.white),
                 icon: const Icon(Icons.person, color: AppColors.whiteColor),
                 color: AppColors.whiteColor,
               ),
@@ -142,10 +165,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               CustomTextField(
                 controller: phoneController,
                 hintText: "Phone Number",
-                hintStyle: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
+                hintStyle: const TextStyle(fontSize: 16, color: Colors.white),
                 icon: const Icon(Icons.call, color: AppColors.whiteColor),
                 color: AppColors.whiteColor,
               ),
@@ -155,32 +175,20 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 child: TextButton(
                   onPressed: _showPhoneResetDialog,
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: const Text(
-                    "Reset Password",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: const Text("Reset Password", style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
               ),
               SizedBox(height: height * 0.05),
               CustomElevatedButton(
                 text: "Update Data",
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: AppColors.blackColor,
-                ),
+                style: const TextStyle(fontSize: 20, color: AppColors.blackColor),
                 color: AppColors.yellowColor,
                 onPressed: _handleUpdate,
               ),
               const SizedBox(height: 15),
               CustomElevatedButton(
                 text: "Delete Account",
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+                style: const TextStyle(fontSize: 20, color: Colors.white),
                 color: AppColors.redColor,
                 onPressed: _handleDelete,
               ),
@@ -297,19 +305,21 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   void _handleUpdate() async {
     String newName = nameController.text.trim();
-
+    if (newName.isEmpty) {
+      _showSnack("Please enter your name");
+      return;
+    }
     setState(() => isLoading = true);
-
     final res = await _authService.updateProfile(
       name: newName,
       photoUrl: avatars[selectedIndex],
     );
-
-    setState(() => isLoading = false);
-
     if (res == "success") {
+      await Provider.of<ProfileViewModel>(context, listen: false).fetchUserData();
+      setState(() => isLoading = false);
       _showSnack("Profile updated successfully!");
     } else {
+      setState(() => isLoading = false);
       _showSnack(res!);
     }
   }

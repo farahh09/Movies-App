@@ -3,6 +3,7 @@ import 'package:movies/authentication/register/register_screen.dart';
 import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/features/main_layout/browse_tab/browse_tab.dart';
 import 'package:movies/features/main_layout/main_layout.dart';
+import 'package:movies/features/main_layout/profile_tab/profile_screen.dart';
 import 'package:movies/features/movie_details_screen/movie_details_screen.dart';
 import 'package:movies/onboarding_screen/onboarding_screen.dart';
 import 'package:movies/authentication/login/login_screen.dart';
@@ -41,6 +42,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const ForgetPasswordScreen());
       case Routes.updateProfileRoute:
         return MaterialPageRoute(builder: (_) => const UpdateProfileScreen());
+      case Routes.profileRoute:
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return unDefinedRoute();
     }

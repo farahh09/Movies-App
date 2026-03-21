@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movies/core/routes_manager/route_manager.dart';
 import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/di.dart';
+import 'package:provider/provider.dart';
+import 'package:movies/features/main_layout/profile_tab/view_models/profile_view_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +25,14 @@ void main() async {
 
   configureDependencies();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
