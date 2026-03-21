@@ -1,32 +1,47 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String? _verificationId;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     clientId: dotenv.env['GOOGLE_CLIENT_ID'],
   );
 
-  String? _verificationId;
+  User? get currentUser => _auth.currentUser;
 
   Future<String?> registerWithEmail({
     required String email,
     required String password,
     required String name,
+    required String phone,
+    required String imagePath,
   }) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+          email: email, password: password);
 
       if (credential.user != null) {
         await credential.user!.updateDisplayName(name);
+        await credential.user!.updatePhotoURL(imagePath);
+
+        await _firestore.collection('users').doc(credential.user!.uid).set({
+          'uid': credential.user!.uid,
+          'name': name,
+          'email': email,
+          'phone_number': phone,
+          'image_path': imagePath,
+          'watch_list': 0,
+          'watch_history': 0,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
         await credential.user!.reload();
       }
-
       return "success";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -40,10 +55,7 @@ class AuthService {
     required String password,
   }) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       return "success";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -64,25 +76,19 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
-      return "success";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
-    } catch (e) {
-      return e.toString();
-    }
-  }
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
 
-  Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
-  }
-
-  User? get currentUser => _auth.currentUser;
-
-  Future<String?> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
+      if (userCredential.user != null) {
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'uid': userCredential.user!.uid,
+          'name': userCredential.user!.displayName ?? "User",
+          'email': userCredential.user!.email,
+          'phone_number': userCredential.user!.phoneNumber ?? "",
+          'image_path': userCredential.user!.photoURL ?? "assets/images/gamer (1) (1).png",
+          'watch_list': 0,
+          'watch_history': 0,
+        }, SetOptions(merge: true));
+      }
       return "success";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -99,9 +105,10 @@ class AuthService {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.signInWithCredential(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
-        onVerificationFailed(e.message ?? "Verification failed");
+        onVerificationFailed(e.message ?? "Verification Failed");
       },
       codeSent: (String verificationId, int? resendToken) {
         _verificationId = verificationId;
@@ -118,23 +125,16 @@ class AuthService {
     required String newPassword,
   }) async {
     try {
-      if (_verificationId == null) return "Invalid verification session. Try again.";
-
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: _verificationId!,
         smsCode: otp,
       );
-
-      // We sign in with the phone credential first.
-      // This creates a fresh session and avoids "previously signed in user" errors.
       UserCredential userCredential = await _auth.signInWithCredential(credential);
-      
-      // Update the password for the account associated with this phone.
-      await userCredential.user?.updatePassword(newPassword);
-
-      return "success";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
+      if (userCredential.user != null) {
+        await userCredential.user!.updatePassword(newPassword);
+        return "success";
+      }
+      return "User not found";
     } catch (e) {
       return e.toString();
     }
@@ -142,10 +142,20 @@ class AuthService {
 
   Future<String?> updateProfile({required String name, required String photoUrl}) async {
     try {
-      await _auth.currentUser?.updateDisplayName(name);
-      await _auth.currentUser?.updatePhotoURL(photoUrl);
-      await _auth.currentUser?.reload();
-      return "success";
+      User? user = _auth.currentUser;
+      if (user != null) {
+        await user.updateDisplayName(name);
+        await user.updatePhotoURL(photoUrl);
+
+        await _firestore.collection('users').doc(user.uid).update({
+          'name': name,
+          'image_path': photoUrl,
+        });
+
+        await user.reload();
+        return "success";
+      }
+      return "User not logged in";
     } catch (e) {
       return e.toString();
     }
@@ -153,13 +163,32 @@ class AuthService {
 
   Future<String?> deleteAccount() async {
     try {
-      await _auth.currentUser?.delete();
-      return "success";
+      User? user = _auth.currentUser;
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).delete();
+        await user.delete();
+        return "success";
+      }
+      return "User not logged in";
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') return "re-authenticate";
+      if (e.code == 'requires-recent-auth') return "re-authenticate";
       return e.message;
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+  }
+
+  Future<void> incrementCounter(String fieldName) async {
+    String? uid = _auth.currentUser?.uid;
+    if (uid != null) {
+      await _firestore.collection('users').doc(uid).update({
+        fieldName: FieldValue.increment(1),
+      });
     }
   }
 }
