@@ -27,9 +27,11 @@ class _SearchTabState extends State<SearchTab> {
         listener: (context, state) {},
         builder: (context, state) {
           final movies = state.movieResponse?.data?.movies;
-          return Scaffold(
-            backgroundColor: AppColors.blackColor,
-            body: SafeArea(
+          return Container(
+            //resizeToAvoidBottomInset: false,
+            //backgroundColor: AppColors.blackColor,
+            color: AppColors.blackColor,
+            child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
@@ -58,7 +60,7 @@ class _SearchTabState extends State<SearchTab> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 13.h),
+                    SizedBox(height: 13),
                     searchController.text.isEmpty
                         ? Expanded(child: Center(child: Image.asset('assets/images/empty_result.png',),))
                         : Expanded(

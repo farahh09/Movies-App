@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:movies/core/routes_manager/routes.dart';
 import 'package:movies/core/widgets/movie_card.dart';
 import 'package:movies/core/widgets/movies_genre.dart';
 import 'package:movies/features/main_layout/home_tab/presentation/bloc/home_bloc.dart';
@@ -68,10 +69,19 @@ class _HomeTabState extends State<HomeTab> {
                             items: state.movieResponse?.data?.movies?.map((movie,) {
                               return Builder(
                                 builder: (BuildContext context) {
-                                  return MovieCard(
-                                    movie: movie,
-                                    width: 234.w,
-                                    height: 351.h,
+                                  return InkWell(
+                                    onTap: (){
+                                      Navigator.pushNamed(
+                                        context,
+                                        Routes.movieDetailsRoute,
+                                        arguments: movie.id,
+                                      );
+                                    },
+                                    child: MovieCard(
+                                      movie: movie,
+                                      width: 234.w,
+                                      height: 351.h,
+                                    ),
                                   );
                                   },
                               );
@@ -81,8 +91,8 @@ class _HomeTabState extends State<HomeTab> {
                               viewportFraction: 0.65,
                               enlargeCenterPage: true,
                               enlargeFactor: 0.25,
-                              // autoPlay: true,
-                              // autoPlayInterval: Duration(seconds: 3),
+                              autoPlay: true,
+                              autoPlayInterval: Duration(seconds: 3),
                               onPageChanged: (index, reason) {
                                 setState(() {
                                   currentIndex = index;

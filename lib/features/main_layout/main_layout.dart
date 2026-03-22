@@ -23,6 +23,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return LoaderOverlay(
       overlayColor: ColorManager.black.withOpacity(0.7),
       overlayWidgetBuilder: (progress) {
@@ -49,9 +50,10 @@ class _MainLayoutState extends State<MainLayout> {
             genres?.sort();
             List<Widget> tabs = [HomeTab(), SearchTab(), BrowseTab(genres: genres,), ProfileScreen()];
             return Scaffold(
+              resizeToAvoidBottomInset: false,
               extendBody: true,
               body: tabs[currentIndex],
-              bottomNavigationBar: MediaQuery.removePadding(
+              bottomNavigationBar: isKeyboardOpen ? null : MediaQuery.removePadding(
                 context: context,
                 removeBottom: true,
                 child: Container(

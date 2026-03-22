@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'view_models/profile_view_model.dart';
@@ -57,8 +58,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      _buildGrid(user.watchListCount),
-                      _buildGrid(user.historyCount),
+                      _buildGrid('watch_list'),
+                      _buildGrid('watch_history'),
                     ],
                   ),
                 ),
@@ -71,6 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildHeader(user) {
+    final uid = _authService.currentUser?.uid;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -81,9 +83,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(user.name, style: TextStyle(color: ColorManager.white, fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
-        _buildStat(user.watchListCount.toString(), "Wish List"),
-        _buildStat(user.historyCount.toString(), "History"),
+        _buildLiveCount(uid, 'watch_list', 'Wish List'),
+        _buildLiveCount(uid, 'watch_history', 'History'),
       ],
+    );
+  }
+
+  Widget _buildLiveCount(String? uid, String collection, String label) {
+    if (uid == null) return _buildStat('0', label);
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc(uid).collection(collection).snapshots(),
+      builder: (context, snapshot) {
+        final count = snapshot.data?.docs.length ?? 0;
+        return _buildStat(count.toString(), label);
+      },
     );
   }
 
@@ -148,26 +161,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildGrid(int count) {
-    if (count == 0) {
-      return Center(child: Image.asset("assets/images/empty_result.png", width: 120));
-    }
-    return GridView.builder(
-      padding: const EdgeInsets.all(15),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.7,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: count,
-      itemBuilder: (context, index) => Container(
-        decoration: BoxDecoration(
-          color: ColorManager.darkGrey,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(Icons.movie, color: ColorManager.white.withOpacity(0.2)),
-      ),
+  Widget _buildGrid(String collection) {
+    final uid = _authService.currentUser?.uid;
+    if (uid == null) return const SizedBox();
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection(collection)
+          .orderBy('addedAt', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Image.asset("assets/images/empty_result.png", width: 120),
+          );
+        }
+
+        final movies = snapshot.data!.docs;
+        return GridView.builder(
+          padding: const EdgeInsets.all(15),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 0.7,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: movies.length,
+          itemBuilder: (context, index) {
+            final data = movies[index].data() as Map<String, dynamic>;
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                data['cover'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: ColorManager.darkGrey,
+                  child: Icon(Icons.movie, color: ColorManager.white.withOpacity(0.2)),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -9,12 +9,20 @@ import 'package:movies/features/movie_details_screen/presentation/bloc/movie_det
 import 'package:movies/features/movie_details_screen/presentation/bloc/movie_details_event.dart';
 import 'package:movies/features/movie_details_screen/presentation/bloc/movie_details_states.dart';
 import 'package:movies/utils/app_colors.dart';
+import 'package:movies/services/AuthService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MovieDetailsScreen extends StatelessWidget {
+class MovieDetailsScreen extends StatefulWidget {
   final num movieID;
 
   const MovieDetailsScreen({super.key, required this.movieID});
 
+  @override
+  State<MovieDetailsScreen> createState() => _MovieDetailsScreenState();
+}
+
+class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
+  bool isBookmarked = false;
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
@@ -28,9 +36,8 @@ class MovieDetailsScreen extends StatelessWidget {
       },
       child: BlocProvider(
         create: (context) => getIt<MovieDetailsBloc>()
-          ..add(GetMovieDetailsEvent(movieID.toString()))
-          ..add(GetMoviesSuggestionEvent(movieID.toString()))
-        ,
+          ..add(GetMovieDetailsEvent(widget.movieID.toString()))
+          ..add(GetMoviesSuggestionEvent(widget.movieID.toString())),
         child: BlocConsumer<MovieDetailsBloc, MovieDetailsStates>(
           listener: (context, state) {
             if (state.getMovieDetailsStatus == RequestStatus.loading) {
@@ -43,6 +50,8 @@ class MovieDetailsScreen extends StatelessWidget {
             final movie = state.movieDetailsResponse?.data?.movie;
             final suggestedMovies = state.moviesSuggestionResponse?.data?.movies;
             if (movie == null) return Scaffold(backgroundColor: AppColors.blackColor, body: SizedBox());
+
+            final authService = AuthService();
 
             return Scaffold(
               backgroundColor: AppColors.blackColor,
@@ -67,9 +76,27 @@ class MovieDetailsScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Align(
-                            alignment: Alignment.center,
-                            child: Image.asset('assets/images/play_movie.png'),
+                          GestureDetector(
+                            onTap: () async {
+                              final uid = authService.currentUser?.uid;
+                              if (uid == null) return;
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(uid)
+                                  .collection('watch_history')
+                                  .doc(movie.id.toString())
+                                  .set({
+                                'id': movie.id,
+                                'title': movie.title,
+                                'cover': movie.largeCoverImage,
+                                'addedAt': FieldValue.serverTimestamp(),
+                              });
+                              await authService.incrementCounter('watch_history');
+                            },
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Image.asset('assets/images/play_movie.png'),
+                            ),
                           ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -117,10 +144,25 @@ class MovieDetailsScreen extends StatelessWidget {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      final uid = authService.currentUser?.uid;
+                                      if (uid == null) return;
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(uid)
+                                          .collection('watch_list')
+                                          .doc(movie.id.toString())
+                                          .set({
+                                        'id': movie.id,
+                                        'title': movie.title,
+                                        'cover': movie.largeCoverImage,
+                                        'addedAt': FieldValue.serverTimestamp(),
+                                      });
+                                      setState(() => isBookmarked = true);
+                                    },
                                     icon: Icon(
                                       Icons.bookmark_rounded,
-                                      color: AppColors.whiteColor,
+                                      color: isBookmarked ? AppColors.yellowColor : AppColors.whiteColor,
                                       size: 29,
                                     ),
                                   ),
@@ -136,7 +178,21 @@ class MovieDetailsScreen extends StatelessWidget {
                       width: 398.w,
                       height: 58.h,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final uid = authService.currentUser?.uid;
+                          if (uid == null) return;
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(uid)
+                              .collection('watch_history')
+                              .doc(movie.id.toString())
+                              .set({
+                            'id': movie.id,
+                            'title': movie.title,
+                            'cover': movie.largeCoverImage,
+                            'addedAt': FieldValue.serverTimestamp(),
+                          });
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.redColor,
                           shape: RoundedRectangleBorder(
@@ -153,7 +209,7 @@ class MovieDetailsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16,),
+                    SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -161,141 +217,110 @@ class MovieDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            spacing: 16,
+                            spacing: 13,
                             children: [
-                              movieChip(
-                                'assets/icons/heart_ic.png',
-                                '${movie.likeCount ?? 0}',
-                              ),
-                              movieChip(
-                                'assets/icons/clock_ic.png',
-                                '${movie.runtime ?? 0}',
-                              ),
-                              movieChip(
-                                'assets/icons/star_ic.png',
-                                '${movie.rating ?? ''}',
-                              ),
+                              movieChip('assets/icons/heart_ic.png', '${movie.likeCount ?? 0}'),
+                              movieChip('assets/icons/clock_ic.png', '${movie.runtime ?? 0}'),
+                              movieChip('assets/icons/star_ic.png', '${movie.rating ?? ''}'),
                             ],
                           ),
-
-                          Text('Screen Shots', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Screen Shots', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24)),
                           Column(
                             spacing: 13,
                             children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.h),
-                                  child: Image.network(movie.largeScreenshotImage1??'')),
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.h),
-                                  child: Image.network(movie.largeScreenshotImage2??'')),
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.h),
-                                  child: Image.network(movie.largeScreenshotImage3??'')),
+                              ClipRRect(borderRadius: BorderRadius.circular(16.h), child: Image.network(movie.largeScreenshotImage1 ?? '')),
+                              ClipRRect(borderRadius: BorderRadius.circular(16.h), child: Image.network(movie.largeScreenshotImage2 ?? '')),
+                              ClipRRect(borderRadius: BorderRadius.circular(16.h), child: Image.network(movie.largeScreenshotImage3 ?? '')),
                             ],
                           ),
+                          Text('Similar', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24)),
+                          CustomGridView(movies: suggestedMovies, shrinkWrap: true, physics: NeverScrollableScrollPhysics()),
 
-                          Text('Similar', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
-                          CustomGridView(movies: suggestedMovies, shrinkWrap: true, physics: NeverScrollableScrollPhysics(),),
+                          Text('Summary', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24)),
+                          Text('${movie.descriptionIntro}', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w400, fontSize: 16)),
 
-                          Text('Summary', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
-                          Text('${movie.descriptionIntro}',style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w400, fontSize: 16),),
-
-                          Text('Cast', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
+                          Text('Cast', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24)),
                           ListView.separated(
-                              itemCount: movie.cast?.length ?? 0,
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                return Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16.r),
-                                        color: AppColors.greyColor
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(11),
-                                      child: Row(
-                                        children: [
-                                          ClipRRect(
-                                              borderRadius: BorderRadius.circular(10.r),
-                                              child: (movie.cast?[index].urlSmallImage?.isNotEmpty == true)
-                                                  ? Image.network(
-                                                movie.cast![index].urlSmallImage!,
-                                              )
-                                                  : SizedBox(width: 60.w, height: 60.h, child: Icon(Icons.person, color: Colors.white,),),
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Name : ${movie.cast?[index].name}',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.w400,
-                                                      fontSize: 20,
-                                                      color: AppColors.whiteColor,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                  Text(
-                                                    'Character : ${movie.cast?[index].characterName}',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.w400,
-                                                      fontSize: 20,
-                                                      color: AppColors.whiteColor,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                            itemCount: movie.cast?.length ?? 0,
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  color: AppColors.greyColor,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(11),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.r),
+                                        child: (movie.cast?[index].urlSmallImage?.isNotEmpty == true)
+                                            ? Image.network(movie.cast![index].urlSmallImage!)
+                                            : SizedBox(width: 60.w, height: 60.h, child: Icon(Icons.person, color: Colors.white)),
                                       ),
-                                    )
-                                );
-                              }, separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.h,),
-                          ),
-
-                          Text('Genres', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24),),
-                          GridView.builder(
-                              itemCount: movie.genres?.length ?? 0,
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: 122 / 36,
-                              ),
-                              itemBuilder: (BuildContext context, int index) {
-                                final genre = movie.genres?[index] ?? '';
-                                return Container(
-                                    width: 122.w,
-                                    height: 36.h,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12.r),
-                                        color: AppColors.greyColor
-                                    ),
-                                    child: Center(
-                                        child: Text(
-                                          genre,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16,
-                                            color: AppColors.whiteColor,
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Name : ${movie.cast?[index].name}',
+                                                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20, color: AppColors.whiteColor),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                              Text(
+                                                'Character : ${movie.cast?[index].characterName}',
+                                                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20, color: AppColors.whiteColor),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ],
                                           ),
-                                        )
-                                    )
-                                );
-                              }
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.h),
                           ),
-                          SizedBox(height: 20.h,)
+                          Text('Genres', style: TextStyle(color: AppColors.whiteColor, fontWeight: FontWeight.w700, fontSize: 24)),
+                          GridView.builder(
+                            itemCount: movie.genres?.length ?? 0,
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 122 / 36,
+                            ),
+                            itemBuilder: (BuildContext context, int index) {
+                              final genre = movie.genres?[index] ?? '';
+                              return Container(
+                                width: 122.w,
+                                height: 36.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  color: AppColors.greyColor,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    genre,
+                                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16, color: AppColors.whiteColor),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 20.h),
                         ],
                       ),
                     ),
@@ -322,14 +347,10 @@ Container movieChip(String icPath, String title) {
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 18,
       children: [
-        Image.asset(icPath, width: 28.w,height: 28.h,),
+        Image.asset(icPath, width: 28.w, height: 28.h),
         Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            color: AppColors.whiteColor,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24, color: AppColors.whiteColor),
         ),
       ],
     ),
